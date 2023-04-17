@@ -38,7 +38,7 @@ const PlacesFormPage = () => {
       setCheckIn(data.checkIn);
       setCheckOut(data.checkOut);
       setMaxGuests(data.maxGuests);
-      // setPrice(data.price);
+      setPrice(data.price);
     });
   }, [id]);
 
@@ -69,7 +69,7 @@ const PlacesFormPage = () => {
       checkIn,
       checkOut,
       maxGuests,
-      // price,
+      price,
     };
     if (id) {
       // update

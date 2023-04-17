@@ -11,6 +11,7 @@ const fs = require("fs");
 //models
 const User = require("./models/User.js");
 const Place = require("./models/Place.js");
+const Booking = require("./models/Booking.js");
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 app.use(cors({ credentials: true, origin: "http://127.0.0.1:5173" }));
@@ -19,6 +20,21 @@ app.use("/uploads", express.static(__dirname + "/uploads"));
 app.get("/test", (req, res) => {
   res.json("hello world");
 });
+
+//  getting userData
+const getUserDataFromReq = (req) => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(
+      req.cookies.token,
+      process.env.JWT_SECRET,
+      {},
+      async (err, userData) => {
+        if (err) throw err;
+        resolve(userData);
+      }
+    );
+  });
+};
 
 app.get("/url", (req, res) => {
   const protocol = req.protocol;
@@ -162,6 +178,7 @@ app.post("/places", (req, res) => {
     checkIn,
     checkOut,
     maxGuests,
+    price,
   } = req.body;
   jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
     if (err) throw err;
@@ -177,12 +194,13 @@ app.post("/places", (req, res) => {
       checkIn,
       checkOut,
       maxGuests,
+      price,
     });
     res.json(placeDoc);
   });
 });
 
-app.put("/api/places", async (req, res) => {
+app.put("/places", async (req, res) => {
   mongoose.connect(process.env.MONGO_URL);
   const { token } = req.cookies;
   const {
@@ -196,9 +214,9 @@ app.put("/api/places", async (req, res) => {
     checkIn,
     checkOut,
     maxGuests,
-    // price,
+    price,
   } = req.body;
-  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+  jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
     if (err) throw err;
     const placeDoc = await Place.findById(id);
     if (userData.id === placeDoc.owner.toString()) {
@@ -212,7 +230,7 @@ app.put("/api/places", async (req, res) => {
         checkIn,
         checkOut,
         maxGuests,
-        // price,
+        price,
       });
       await placeDoc.save();
       res.json("ok");
@@ -220,7 +238,7 @@ app.put("/api/places", async (req, res) => {
   });
 });
 
-app.get("/places", (req, res) => {
+app.get("/user-places", (req, res) => {
   mongoose.connect(process.env.MONGO_URL);
   const { token } = req.cookies;
   jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
@@ -234,4 +252,41 @@ app.get("/places/:id", async (req, res) => {
   res.json(await Place.findById(id));
 });
 
+// for index page in client
+
+app.get("/places", async (req, res) => {
+  mongoose.connect(process.env.MONGO_URL);
+  res.json(await Place.find());
+});
+
+// booking
+app.post("/bookings", async (req, res) => {
+  mongoose.connect(process.env.MONGO_URL);
+  const userData = await getUserDataFromReq(req);
+  const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
+    req.body;
+
+  Booking.create({
+    place,
+    checkIn,
+    checkOut,
+    numberOfGuests,
+    name,
+    phone,
+    price,
+    user: userData.id,
+  })
+    .then((doc) => {
+      res.json(doc);
+    })
+    .catch((err) => {
+      throw err;
+    });
+});
+
+app.get("/bookings", async (req, res) => {
+  mongoose.connect(process.env.MONGO_URL);
+  const userData = await getUserDataFromReq(req);
+  res.json(await Booking.find({ user: userData.id }).populate("place"));
+});
 app.listen(4000);
