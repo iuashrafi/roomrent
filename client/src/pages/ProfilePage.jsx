@@ -20,9 +20,9 @@ const ProfilePage = () => {
 
   async function logout() {
     alert("logging you out...");
-    //  await axios.post("http://localhost:4000/api/logout");
-    //   setRedirect("/");
-    // setUser(null);
+    await axios.post("http://localhost:4000/api/logout");
+    setRedirect("/");
+    setUser(null);
   }
   if (redirect) {
     return <Navigate to={redirect} />;
