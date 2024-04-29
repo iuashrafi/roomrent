@@ -1,11 +1,11 @@
 # roomrent
 
 Screenshots :
-![ss1](https://github.com/iuashrafi/roomrent/blob/main/screenshots/ss1.png)
+![ss1](https://github.com/iuashrafi/roomrent/blob/main/screenshots/Roomrent.png)
 
-![ss2](https://github.com/iuashrafi/roomrent/blob/main/screenshots/ss2.png)
+![ss2](https://github.com/iuashrafi/roomrent/blob/main/screenshots/listing3.png)
 
-![ss3](https://github.com/iuashrafi/roomrent/blob/main/screenshots/ss3.png)
+![ss3](https://github.com/iuashrafi/roomrent/blob/main/screenshots/register2.png)
 
 ## Setup
 
